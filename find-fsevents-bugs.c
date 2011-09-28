@@ -70,15 +70,17 @@ void walk(const char *dir_name, int depth) {
     }
 
     dirp = opendir(path_buf);
-    while ((dirent = readdir(dirp)) != NULL) {
-        if (0 == strcmp(dirent->d_name, ".") || 0 == strcmp(dirent->d_name, ".."))
-            continue;
-        // printf("%s\n", dirent->d_name);
-        if (dirent->d_type == DT_DIR && depth < 100) {
-            walk(dirent->d_name, depth + 1);
+    if (dirp) {
+        while ((dirent = readdir(dirp)) != NULL) {
+            if (0 == strcmp(dirent->d_name, ".") || 0 == strcmp(dirent->d_name, ".."))
+                continue;
+            // printf("%s\n", dirent->d_name);
+            if (dirent->d_type == DT_DIR && depth < 100) {
+                walk(dirent->d_name, depth + 1);
+            }
         }
+        closedir(dirp);
     }
-    closedir(dirp);
 
     path_end = path_end_saved;
     *path_end = 0;
