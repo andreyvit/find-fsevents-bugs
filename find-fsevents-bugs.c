@@ -57,7 +57,7 @@ void walk(const char *dir_name, int depth) {
     DIR *dirp;
     char *path_end_saved = path_end;
 
-    if (*path_buf)
+    if (*path_buf && path_end[-1] != '/')
         *path_end++ = '/';
     path_end = stpcpy(path_end, dir_name);
 
