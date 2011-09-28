@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdarg.h>
+#include <CoreServices/CoreServices.h>
 
 static char path_buf[1024 * 1024], *path_end;
 static char real_path_buf[1024 * 1024];
@@ -56,6 +57,13 @@ void walk(const char *dir_name, int depth) {
     struct dirent *dirent;
     DIR *dirp;
     char *path_end_saved = path_end;
+    FSRef fsref;
+    AliasHandle itemAlias;
+    HFSUniStr255 targetName;
+    HFSUniStr255 volumeName;
+    CFStringRef pathString;
+    FSAliasInfoBitmap returnedInInfo;
+    FSAliasInfo info;
 
     if (*path_buf && path_end[-1] != '/')
         *path_end++ = '/';
@@ -65,7 +73,16 @@ void walk(const char *dir_name, int depth) {
 
     realpath(path_buf, real_path_buf);
     if (0 != strcmp(path_buf, real_path_buf)) {
-        output("Found: '%s' != '%s'\n", path_buf, real_path_buf);
+        output("Found (realpath): '%s' != '%s'\n", path_buf, real_path_buf);
+        ++results;
+    }
+
+    FSPathMakeRefWithOptions(path_buf, kFSPathMakeRefDoNotFollowLeafSymlink, &fsref, NULL);
+    FSNewAlias(NULL, &fsref, &itemAlias);
+    FSCopyAliasInfo(itemAlias, &targetName, &volumeName, &pathString, &returnedInInfo, &info);
+    CFStringGetCString(pathString, real_path_buf, sizeof(real_path_buf), kCFStringEncodingUTF8);
+    if (0 != strcmp(path_buf, real_path_buf)) {
+        output("Found (FSCopyAliasInfo): '%s' != '%s'\n", path_buf, real_path_buf);
         ++results;
     }
 
