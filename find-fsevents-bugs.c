@@ -73,7 +73,6 @@ void walk(const char *dir_name, int depth) {
     while ((dirent = readdir(dirp)) != NULL) {
         if (0 == strcmp(dirent->d_name, ".") || 0 == strcmp(dirent->d_name, ".."))
             continue;
-        progress("%s/%s", path_buf, dirent->d_name);
         // printf("%s\n", dirent->d_name);
         if (dirent->d_type == DT_DIR && depth < 100) {
             walk(dirent->d_name, depth + 1);
