@@ -64,6 +64,7 @@ void walk(const char *dir_name, int depth) {
     CFStringRef pathString;
     FSAliasInfoBitmap returnedInInfo;
     FSAliasInfo info;
+    bool found = false;
 
     if (*path_buf && path_end[-1] != '/')
         *path_end++ = '/';
@@ -74,7 +75,7 @@ void walk(const char *dir_name, int depth) {
     realpath(path_buf, real_path_buf);
     if (0 != strcmp(path_buf, real_path_buf)) {
         output("Found (realpath): '%s' != '%s'\n", path_buf, real_path_buf);
-        ++results;
+        found = true;
     }
 
     FSPathMakeRefWithOptions(path_buf, kFSPathMakeRefDoNotFollowLeafSymlink, &fsref, NULL);
@@ -83,7 +84,12 @@ void walk(const char *dir_name, int depth) {
     CFStringGetCString(pathString, real_path_buf, sizeof(real_path_buf), kCFStringEncodingUTF8);
     if (0 != strcmp(path_buf, real_path_buf)) {
         output("Found (FSCopyAliasInfo): '%s' != '%s'\n", path_buf, real_path_buf);
+        found = true;
+    }
+
+    if (found) {
         ++results;
+        goto skip_children;
     }
 
     dirp = opendir(path_buf);
@@ -99,6 +105,7 @@ void walk(const char *dir_name, int depth) {
         closedir(dirp);
     }
 
+skip_children:
     path_end = path_end_saved;
     *path_end = 0;
 }
