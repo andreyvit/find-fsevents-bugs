@@ -67,7 +67,7 @@ void walk(const char *dir_name, int depth) {
     CFStringRef pathString;
     FSAliasInfoBitmap returnedInInfo;
     FSAliasInfo info;
-    bool found = false;
+    bool found_realpath = false, found_alias = false;
 
     if (*path_buf && path_end[-1] != '/')
         *path_end++ = '/';
@@ -78,7 +78,7 @@ void walk(const char *dir_name, int depth) {
     realpath(path_buf, real_path_buf);
     if (0 != strcmp(path_buf, real_path_buf)) {
         output("Found (realpath): '%s' != '%s'\n", path_buf, real_path_buf);
-        found = true;
+        found_realpath = true;
     }
 
     FSPathMakeRefWithOptions(path_buf, kFSPathMakeRefDoNotFollowLeafSymlink, &fsref, NULL);
@@ -86,15 +86,15 @@ void walk(const char *dir_name, int depth) {
     FSCopyAliasInfo(itemAlias, &targetName, &volumeName, &pathString, &returnedInInfo, &info);
     CFStringGetCString(pathString, alias_buf, sizeof(alias_buf), kCFStringEncodingUTF8);
     if (0 != strcmp(path_buf, alias_buf)) {
-        found = true;
+        found_alias = true;
     }
 
-    if (found) {
+    if (found_realpath || found_alias) {
         ++results;
         output("Result %ld:\n"
-               "  readdir:         %s\n"
-               "  realpath:        %s\n"
-               "  FSCopyAliasInfo: %s\n", (long)results, path_buf, real_path_buf, alias_buf);
+               "    readdir:         %s\n"
+               "   %crealpath:        %s\n"
+               "   %cFSCopyAliasInfo: %s\n", (long)results, path_buf, (found_realpath ? '!' : ' '), real_path_buf, (found_alias ? '!' : ' '), alias_buf);
         goto skip_children;
     }
 
