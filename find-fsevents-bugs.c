@@ -7,6 +7,7 @@
 
 static char path_buf[1024 * 1024], *path_end;
 static char real_path_buf[1024 * 1024];
+static char alias_buf[1024 * 1024];
 
 static char progress_buf[10240];
 static int last_progress_len = 0;
@@ -81,14 +82,17 @@ void walk(const char *dir_name, int depth) {
     FSPathMakeRefWithOptions(path_buf, kFSPathMakeRefDoNotFollowLeafSymlink, &fsref, NULL);
     FSNewAlias(NULL, &fsref, &itemAlias);
     FSCopyAliasInfo(itemAlias, &targetName, &volumeName, &pathString, &returnedInInfo, &info);
-    CFStringGetCString(pathString, real_path_buf, sizeof(real_path_buf), kCFStringEncodingUTF8);
-    if (0 != strcmp(path_buf, real_path_buf)) {
-        output("Found (FSCopyAliasInfo): '%s' != '%s'\n", path_buf, real_path_buf);
+    CFStringGetCString(pathString, alias_buf, sizeof(alias_buf), kCFStringEncodingUTF8);
+    if (0 != strcmp(path_buf, alias_buf)) {
         found = true;
     }
 
     if (found) {
         ++results;
+        output("Result %ld:\n"
+               "  readdir:         %s\n"
+               "  realpath:        %s\n"
+               "  FSCopyAliasInfo: %s\n", (long)results, path_buf, real_path_buf, alias_buf);
         goto skip_children;
     }
 
