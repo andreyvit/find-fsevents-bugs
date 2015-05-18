@@ -14,6 +14,8 @@ static int last_progress_len = 0;
 
 static int results = 0;
 
+static const int max_progress_len = 79;
+
 void erase() {
     int i;
     printf("\r");
@@ -35,8 +37,8 @@ void progress(const char *fmt, ...) {
     vsprintf(progress_buf, fmt, va);
     va_end(va);
 
-    if (strlen(progress_buf) > 120) {
-        strcpy(progress_buf + 120-3, "...");
+    if (strlen(progress_buf) > max_progress_len) {
+        strcpy(progress_buf + max_progress_len-3, "...");
     }
 
     show_progress();
