@@ -6,7 +6,7 @@ this tool tries to find directories that cause realpath to report incorrect case
 
 Usage:
 
-    find-fsevents-bugs /Users/andreyvit
+    find-fsevents-bugs $HOME
 
 
 Building
@@ -17,6 +17,6 @@ Clone this Git repository, then run make:
     git clone git://github.com/andreyvit/find-fsevents-bugs.git
     cd find-fsevents-bugs
     make
-    sudo make install
+    ./find-fsevents-bugs $HOME
 
 You need to have Xcode installed for the build to work.
