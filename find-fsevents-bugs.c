@@ -92,9 +92,9 @@ void walk(const char *dir_name, int depth) {
     if (found_realpath || found_alias) {
         ++results;
         output("Result %ld:\n"
-               "    readdir:         %s\n"
-               "   %crealpath:        %s\n"
-               "   %cFSCopyAliasInfo: %s\n", (long)results, path_buf, (found_realpath ? '!' : ' '), real_path_buf, (found_alias ? '!' : ' '), alias_buf);
+               "  readdir:         %s\n"
+               " %crealpath:        %s\n"
+               " %cFSCopyAliasInfo: %s\n", (long)results, path_buf, (found_realpath ? '!' : ' '), real_path_buf, (found_alias ? '!' : ' '), alias_buf);
         goto skip_children;
     }
 
